@@ -40,7 +40,7 @@ pipeline {
                     }
                     post {
                         always {
-                            junit 'jest-results/junit.xml'
+                            junit 'test-results/junit.xml'
                         }
                     }
                 }
@@ -70,31 +70,20 @@ pipeline {
                 }
             }
         }
+
         stage('Deploy') {
             agent {
-                docker{
+                docker {
                     image 'node:18-alpine'
                     reuseNode true
-
                 }
             }
             steps {
-               sh '''                    
+                sh '''
                     npm install netlify-cli
-                    node_modules/.bin/netlify --version              
+                    node_modules/.bin/netlify --version
                 '''
             }
-        }
-    }
-    post {
-        always {
-           junit 'test-results/junit.xml'
-        }
-        success {
-            echo 'This will run only if successful'
-        }
-        failure {
-            echo 'This will run only if failed'
         }
     }
 }
