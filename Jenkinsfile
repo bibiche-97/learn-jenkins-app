@@ -1,6 +1,11 @@
 pipeline {
     agent any
 
+    environment {
+        NETLIFY_SITE_ID = 'bb7144e9-0561-4fb4-94ef-6fbd31c01ca7'
+    }
+
+
     stages {
 
         stage('Build') {
@@ -59,12 +64,21 @@ pipeline {
                             node_modules/.bin/serve -s build &
                             sleep 10
                             npx playwright test  --reporter=html
+                            sh 'ls -la playwright-report'
                         '''
                     }
 
                     post {
                         always {
-                            publishHTML([allowMissing: false, alwaysLinkToLastBuild: false, keepAll: false, reportDir: 'playwright-report', reportFiles: 'index.html', reportName: 'Playwright HTML Report', reportTitles: '', useWrapperFileDirectly: true])
+                            publishHTML([
+                                allowMissing: false, 
+                                alwaysLinkToLastBuild: false, 
+                                keepAll: false, 
+                                reportDir: 'playwright-report', 
+                                reportFiles: 'index.html', 
+                                reportName: 'Playwright HTML Report', 
+                                reportTitles: '', 
+                                useWrapperFileDirectly: true])
                         }
                     }
                 }
@@ -82,6 +96,7 @@ pipeline {
                 sh '''
                     npm install netlify-cli
                     node_modules/.bin/netlify --version
+                    echo "Deploying to production. Site ID: $NETLIFY_SITE_ID"
                 '''
             }
         }
